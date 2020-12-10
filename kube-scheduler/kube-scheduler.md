@@ -1,4 +1,4 @@
-#kube-scheduler 详细分析
+# kube-scheduler 详细分析
 
 * 总入口 cmd/kube-scheduler/scheduler.go
 入口函数为 app.NewSchedulerCommand()，进入到app/server.go runCommand()是主体函数，先开始主要看下这个函数实现以及参数
@@ -92,9 +92,9 @@ func (o *Options) Config() (*schedulerappconfig.Config, error) {
 	return c, nil
 }
 ```
-我们再接着看下opt.Config()这个方法，可以看到里面有个关键的方法 o.ApplyTo(c) 调用来填冲　Config 这个结构体，而 Config 这个结构体有着 
-kube-scheduer 启动所需的必要配置(例如:informer ... )，再来看下这个ApplyTo的方法，很简单如果有ConfigFile，就从ConfigFile读取配置
-不然调用老的遗弃配置来填冲
+我们再接着看下opt.Config()这个方法，可以看到里面有个关键的方法 o.ApplyTo(c) 调用来填冲　Config 这个结构体，之后把各种必需的 Client 配置给
+Config,而 Config 这个结构体有着 kube-scheduer 启动所需的必要配置(例如:informer ... )，再来看下这个ApplyTo的方法，很简单如果有ConfigFile，
+就从ConfigFile读取配置,不然调用老的遗弃配置来填冲
 ```
 // ApplyTo applies the scheduler options to the given scheduler app configuration.
 func (o *Options) ApplyTo(c *schedulerappconfig.Config) error {
@@ -107,6 +107,12 @@ func (o *Options) ApplyTo(c *schedulerappconfig.Config) error {
     }
     ...
 ```
+
+接着再来看下　cc := c.Complete()　这个方法看起来就是重新包装了下　Config 这个结构体
+
+
+
+
 
 runCommand() 主要参数有(*options.Options, registryOptions ...Option), 其中的registryOptions ...Option这个应该是给scheduler framework plugins注册用的，后面再分析，先看下options.Options
 
